@@ -116,3 +116,87 @@ formSolicitud.addEventListener("submit", function (evento) {
 
   formSolicitud.reset();
 });
+// ===== SESIÓN (Módulo 3) =====
+const CLAVE_SESION = "sesionActual";
+
+// Guarda en el navegador el id del usuario que inició sesión
+function guardarSesion(usuario) {
+  sessionStorage.setItem(CLAVE_SESION, usuario.id);
+}
+
+// Devuelve el usuario con sesión iniciada, o null si no hay ninguno
+function obtenerSesion() {
+  try {
+    const id = sessionStorage.getItem(CLAVE_SESION);
+    if (!id) {
+      return null;
+    }
+    const encontrado = usuarios.find(function (u) {
+      return u.id === Number(id);
+    });
+    return encontrado || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Borra la sesión
+function cerrarSesion() {
+  sessionStorage.removeItem(CLAVE_SESION);
+}
+
+// ===== FORMULARIO DE LOGIN =====
+const formLogin = document.getElementById("formLogin");
+
+formLogin.addEventListener("submit", function (evento) {
+  evento.preventDefault();
+
+  const nombreUsuario = document.getElementById("loginUsuario").value.trim();
+  const clave = document.getElementById("loginClave").value;
+
+  // 1. Campos vacíos
+  if (nombreUsuario === "" || clave === "") {
+    Swal.fire({
+      icon: "warning",
+      title: "Campos incompletos",
+      text: "Ingrese su usuario y su contraseña."
+    });
+    return;
+  }
+
+  // 2. Buscar el usuario con esas credenciales
+  const usuarioEncontrado = usuarios.find(function (u) {
+    return u.usuario === nombreUsuario && u.clave === clave;
+  });
+
+  if (!usuarioEncontrado) {
+    Swal.fire({
+      icon: "error",
+      title: "Acceso inválido",
+      text: "Usuario o contraseña incorrectos."
+    });
+    return;
+  }
+
+  // 3. Cuenta deshabilitada
+  if (!usuarioEncontrado.activo) {
+    Swal.fire({
+      icon: "error",
+      title: "Cuenta deshabilitada",
+      text: "Su cuenta está deshabilitada. Comuníquese con el administrador."
+    });
+    return;
+  }
+
+  // 4. Acceso correcto
+  guardarSesion(usuarioEncontrado);
+  formLogin.reset();
+
+  Swal.fire({
+    icon: "success",
+    title: "Bienvenido",
+    text: usuarioEncontrado.nombre + " (" + usuarioEncontrado.rol + ")",
+    timer: 1800,
+    showConfirmButton: false
+  });
+});
