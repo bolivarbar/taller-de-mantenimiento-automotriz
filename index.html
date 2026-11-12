@@ -23,6 +23,8 @@
           <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="#acerca">Acerca de</a></li>
           <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#solicitud">Solicitud</a></li>
+          <li class="nav-item"><a class="nav-link" href="#login" id="enlaceLogin">Iniciar sesión</a></li>
         </ul>
       </div>
     </div>
@@ -292,6 +294,28 @@
             <button type="submit" class="btn btn-primary">Enviar solicitud</button>
             <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
           </div>
+        </form>
+      </div>
+    </section>
+        <!-- SECCIÓN LOGIN -->
+    <section id="login" class="py-5 bg-light">
+      <div class="container">
+        <h2 class="text-center mb-4">Iniciar sesión</h2>
+
+        <form id="formLogin" class="col-md-6 col-lg-4 mx-auto" novalidate>
+          <div class="mb-3">
+            <label for="loginUsuario" class="form-label">Usuario</label>
+            <input type="text" class="form-control" id="loginUsuario"
+                   name="usuario" autocomplete="username" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="loginClave" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="loginClave"
+                   name="clave" autocomplete="current-password" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Ingresar</button>
         </form>
       </div>
     </section>

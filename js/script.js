@@ -37,7 +37,7 @@ const usuarios = [
     usuario: "cliente3",
     clave: "Cliente2026",
     rol: "Cliente",
-    correo: "luis@correo.com",
+    correo: "luis@correo.com",git add .
     telefono: "0993333333",
     activo: false
   }
