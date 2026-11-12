@@ -132,6 +132,169 @@
         </div>
       </div>
     </section>
+        <!-- SECCIÓN SOLICITUD DE MANTENIMIENTO -->
+    <section id="solicitud" class="py-5">
+      <div class="container">
+        <h2 class="text-center mb-4">Solicitud de mantenimiento</h2>
+
+        <form id="formSolicitud" class="col-lg-8 mx-auto" novalidate>
+
+          <!-- Datos del cliente -->
+          <fieldset class="mb-4">
+            <legend class="h5">Datos del cliente</legend>
+
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre completo</label>
+              <input type="text" class="form-control" id="nombre" name="nombre"
+                     placeholder="Ej: Juan Pérez" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="telefono" class="form-label">Teléfono</label>
+              <input type="text" class="form-control" id="telefono" name="telefono"
+                     placeholder="Ej: 0991234567" maxlength="10" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="correo" class="form-label">Correo electrónico</label>
+              <input type="email" class="form-control" id="correo" name="correo"
+                     placeholder="Ej: juan@correo.com" required>
+            </div>
+          </fieldset>
+
+                    <!-- Datos del automóvil -->
+          <fieldset class="mb-4">
+            <legend class="h5">Datos del automóvil</legend>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="placa" class="form-label">Placa</label>
+                <input type="text" class="form-control text-uppercase" id="placa" name="placa"
+                       placeholder="Ej: ABC-1234" maxlength="8" required>
+              </div>
+
+              <div class="col-md-6">
+                <label for="marca" class="form-label">Marca</label>
+                <input type="text" class="form-control" id="marca" name="marca"
+                       placeholder="Ej: Chevrolet" required>
+              </div>
+
+              <div class="col-md-6">
+                <label for="modelo" class="form-label">Modelo</label>
+                <input type="text" class="form-control" id="modelo" name="modelo"
+                       placeholder="Ej: Aveo" required>
+              </div>
+
+              <div class="col-md-3">
+                <label for="anio" class="form-label">Año</label>
+                <input type="number" class="form-control" id="anio" name="anio"
+                       placeholder="Ej: 2018" min="1980" max="2027" required>
+              </div>
+
+              <div class="col-md-3">
+                <label for="kilometraje" class="form-label">Kilometraje</label>
+                <input type="number" class="form-control" id="kilometraje" name="kilometraje"
+                       placeholder="Ej: 45000" min="0" required>
+              </div>
+            </div>
+          </fieldset>
+
+                    <!-- Datos del servicio -->
+          <fieldset class="mb-4">
+            <legend class="h5">Datos del servicio</legend>
+
+            <div class="mb-3">
+              <label for="servicio" class="form-label">Tipo de servicio</label>
+              <select class="form-select" id="servicio" name="servicio" required>
+                <option value="" selected disabled>Seleccione un servicio</option>
+                <option value="Cambio de aceite y filtros">Cambio de aceite y filtros</option>
+                <option value="Revisión de frenos">Revisión de frenos</option>
+                <option value="Alineación y balanceo">Alineación y balanceo</option>
+                <option value="Diagnóstico con escáner">Diagnóstico con escáner</option>
+                <option value="Suspensión y dirección">Suspensión y dirección</option>
+                <option value="Aire acondicionado">Aire acondicionado</option>
+              </select>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="fecha" name="fecha" required>
+              </div>
+
+              <div class="col-md-6">
+                <label for="hora" class="form-label">Hora</label>
+                <input type="time" class="form-control" id="hora" name="hora"
+                       min="08:00" max="17:00" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <span class="form-label d-block">Prioridad</span>
+
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="prioridad"
+                       id="prioridadNormal" value="Normal" checked>
+                <label class="form-check-label" for="prioridadNormal">Normal</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="prioridad"
+                       id="prioridadUrgente" value="Urgente">
+                <label class="form-check-label" for="prioridadUrgente">Urgente</label>
+              </div>
+            </div>
+          </fieldset>
+
+                    <!-- Servicios adicionales y observaciones -->
+          <fieldset class="mb-4">
+            <legend class="h5">Información adicional</legend>
+
+            <div class="mb-3">
+              <span class="form-label d-block">Servicios adicionales (opcional)</span>
+
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="adicionales"
+                       id="adicLavado" value="Lavado exterior">
+                <label class="form-check-label" for="adicLavado">Lavado exterior</label>
+              </div>
+
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="adicionales"
+                       id="adicNiveles" value="Revisión de niveles">
+                <label class="form-check-label" for="adicNiveles">Revisión de niveles</label>
+              </div>
+
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="adicionales"
+                       id="adicLlantas" value="Revisión de presión de llantas">
+                <label class="form-check-label" for="adicLlantas">Revisión de presión de llantas</label>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="observaciones" class="form-label">Observaciones</label>
+              <textarea class="form-control" id="observaciones" name="observaciones"
+                        rows="3" maxlength="300"
+                        placeholder="Describa el problema o lo que necesita revisar"></textarea>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="confirmacion" required>
+              <label class="form-check-label" for="confirmacion">
+                Confirmo que los datos ingresados son correctos.
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Botones -->
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+            <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
+          </div>
+        </form>
+      </div>
+    </section>
 
   </main>
 
