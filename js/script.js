@@ -1,3 +1,47 @@
+// ===== USUARIOS DE PRUEBA (Módulo 3) =====
+// Solo para la práctica: en un sistema real las claves nunca se guardan en el frontend.
+const usuarios = [
+  {
+    id: 1,
+    nombre: "Administrador del Taller",
+    usuario: "admin",
+    clave: "Admin2026",
+    rol: "Administrador",
+    correo: "admin@autoserv.com",
+    telefono: "0990000001",
+    activo: true
+  },
+  {
+    id: 2,
+    nombre: "Carlos Mendoza",
+    usuario: "cliente1",
+    clave: "Cliente2026",
+    rol: "Cliente",
+    correo: "carlos@correo.com",
+    telefono: "0991111111",
+    activo: true
+  },
+  {
+    id: 3,
+    nombre: "Ana Torres",
+    usuario: "cliente2",
+    clave: "Cliente2026",
+    rol: "Cliente",
+    correo: "ana@correo.com",
+    telefono: "0992222222",
+    activo: true
+  },
+  {
+    id: 4,
+    nombre: "Luis Paredes",
+    usuario: "cliente3",
+    clave: "Cliente2026",
+    rol: "Cliente",
+    correo: "luis@correo.com",
+    telefono: "0993333333",
+    activo: false
+  }
+];
 // ===== ARRAY QUE GUARDA LAS SOLICITUDES =====
 const CLAVE_SOLICITUDES = "solicitudes";
 
