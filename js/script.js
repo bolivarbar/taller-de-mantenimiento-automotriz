@@ -244,6 +244,164 @@ function editarSolicitud(id) {
 botonCancelarEdicion.addEventListener("click", function () {
   formSolicitud.reset();
 });
+// ===== VALIDACIONES DEL FORMULARIO DE SOLICITUD =====
+const ANIO_MINIMO = 1980;
+const KM_MAXIMO = 999999;
+
+// Fecha de hoy como texto AAAA-MM-DD (el mismo formato del campo date)
+function fechaHoy() {
+  const hoy = new Date();
+  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+  const dia = String(hoy.getDate()).padStart(2, "0");
+  return hoy.getFullYear() + "-" + mes + "-" + dia;
+}
+
+// Hora actual como texto HH:MM (el mismo formato del campo time)
+function horaAhora() {
+  const ahora = new Date();
+  const horas = String(ahora.getHours()).padStart(2, "0");
+  const minutos = String(ahora.getMinutes()).padStart(2, "0");
+  return horas + ":" + minutos;
+}
+
+// Revisa todos los campos y devuelve un array con los mensajes de error
+function validarSolicitud(esEdicion) {
+  const errores = [];
+
+  // Quita las marcas rojas de una validación anterior
+  formSolicitud.querySelectorAll(".is-invalid").forEach(function (campo) {
+    campo.classList.remove("is-invalid");
+  });
+
+  // Registra un error y marca el campo en rojo
+  function error(idCampo, mensaje) {
+    errores.push(mensaje);
+    document.getElementById(idCampo).classList.add("is-invalid");
+  }
+
+  const nombre = document.getElementById("nombre").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+  const correo = document.getElementById("correo").value.trim();
+  const placa = document.getElementById("placa").value.trim().toUpperCase();
+  const marca = document.getElementById("marca").value.trim();
+  const modelo = document.getElementById("modelo").value.trim();
+  const anioTexto = document.getElementById("anio").value.trim();
+  const kmTexto = document.getElementById("kilometraje").value.trim();
+  const servicio = document.getElementById("servicio").value;
+  const fecha = document.getElementById("fecha").value;
+  const hora = document.getElementById("hora").value;
+  const observaciones = document.getElementById("observaciones").value;
+
+  // --- Datos del cliente ---
+  if (nombre.length < 3) {
+    error("nombre", "El nombre debe tener al menos 3 caracteres.");
+  } else if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/.test(nombre)) {
+    error("nombre", "El nombre solo puede contener letras y espacios.");
+  }
+
+  if (!/^09\d{8}$/.test(telefono)) {
+    error("telefono", "El teléfono debe tener 10 dígitos y empezar con 09.");
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+    error("correo", "Ingrese un correo electrónico válido.");
+  }
+
+  // --- Datos del automóvil ---
+  if (!/^[A-Z]{3}-\d{3,4}$/.test(placa)) {
+    error("placa", "La placa debe tener el formato ABC-1234 (tres letras, guion y 3 o 4 números).");
+  }
+
+  if (marca === "") {
+    error("marca", "Ingrese la marca del vehículo.");
+  }
+
+  if (modelo === "") {
+    error("modelo", "Ingrese el modelo del vehículo.");
+  }
+
+  const anio = Number(anioTexto);
+  const anioMaximo = new Date().getFullYear() + 1;
+  if (anioTexto === "" || !Number.isInteger(anio) || anio < ANIO_MINIMO || anio > anioMaximo) {
+    error("anio", "El año debe ser un número entero entre " + ANIO_MINIMO + " y " + anioMaximo + ".");
+  }
+
+  const km = Number(kmTexto);
+  if (kmTexto === "" || !Number.isInteger(km) || km < 0 || km > KM_MAXIMO) {
+    error("kilometraje", "El kilometraje debe ser un número entero entre 0 y " + KM_MAXIMO + ".");
+  }
+
+  // --- Servicio ---
+  if (servicio === "") {
+    error("servicio", "Seleccione un tipo de servicio.");
+  }
+
+  // --- Fecha ---
+  if (fecha === "") {
+    error("fecha", "Seleccione una fecha.");
+  } else if (!esEdicion && fecha < fechaHoy()) {
+    error("fecha", "La fecha no puede ser anterior a hoy.");
+  } else if (new Date(fecha + "T00:00:00").getDay() === 0) {
+    error("fecha", "El taller no atiende los domingos.");
+  }
+
+  // --- Hora (según el horario del taller) ---
+  if (hora === "") {
+    error("hora", "Seleccione una hora.");
+  } else {
+    const diaSemana = fecha === "" ? null : new Date(fecha + "T00:00:00").getDay();
+    const horaCierre = diaSemana === 6 ? "13:00" : "17:00";
+
+    if (hora < "08:00" || hora > horaCierre) {
+      error("hora", "El horario de atención para esa fecha es de 08:00 a " + horaCierre + ".");
+    } else if (!esEdicion && fecha === fechaHoy() && hora <= horaAhora()) {
+      error("hora", "Esa hora ya pasó. Elija una hora posterior a la actual.");
+    }
+  }
+
+  // --- Observaciones y confirmación ---
+  if (observaciones.length > 300) {
+    error("observaciones", "Las observaciones no pueden superar los 300 caracteres.");
+  }
+
+  if (!document.getElementById("confirmacion").checked) {
+    error("confirmacion", "Debe confirmar que los datos ingresados son correctos.");
+  }
+
+  return errores;
+}
+
+// Muestra todos los errores juntos en una ventana de SweetAlert2
+function mostrarErrores(errores) {
+  const lista = document.createElement("ul");
+  lista.className = "text-start mb-0";
+
+  errores.forEach(function (mensaje) {
+    const item = document.createElement("li");
+    item.textContent = mensaje;
+    lista.appendChild(item);
+  });
+
+  Swal.fire({
+    icon: "error",
+    title: "No se pudo guardar la solicitud",
+    html: lista
+  });
+}
+
+// Quita la marca roja de un campo apenas el usuario lo corrige
+function quitarMarca(evento) {
+  evento.target.classList.remove("is-invalid");
+}
+formSolicitud.addEventListener("input", quitarMarca);
+formSolicitud.addEventListener("change", quitarMarca);
+
+// El botón "Limpiar" también borra todas las marcas rojas
+formSolicitud.addEventListener("reset", function () {
+  formSolicitud.querySelectorAll(".is-invalid").forEach(function (campo) {
+    campo.classList.remove("is-invalid");
+  });
+});
 
 formSolicitud.addEventListener("submit", function (evento) {
   // Evita que el navegador recargue la página al enviar
@@ -271,6 +429,12 @@ formSolicitud.addEventListener("submit", function (evento) {
       title: "Acceso denegado",
       text: "Solo el administrador puede editar solicitudes."
     });
+    return;
+  }
+    // Validar los datos antes de guardar
+  const errores = validarSolicitud(eraEdicion);
+  if (errores.length > 0) {
+    mostrarErrores(errores);
     return;
   }
 
