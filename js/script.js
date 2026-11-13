@@ -930,3 +930,19 @@ function protegerDireccion() {
 
 window.addEventListener("hashchange", protegerDireccion);
 protegerDireccion();
+
+// Botón "Solicitar mantenimiento" de Inicio: sin sesión, lleva al login
+const botonSolicitar = document.getElementById("botonSolicitar");
+
+botonSolicitar.addEventListener("click", function (evento) {
+  if (!obtenerSesion()) {
+    evento.preventDefault();
+    Swal.fire({
+      icon: "info",
+      title: "Inicie sesión",
+      text: "Para solicitar un mantenimiento primero debe iniciar sesión."
+    }).then(function () {
+      window.location.hash = "#login";
+    });
+  }
+});
