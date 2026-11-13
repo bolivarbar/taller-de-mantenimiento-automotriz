@@ -130,17 +130,95 @@ function prellenarFormulario() {
   }
 }
 
+// ===== MODO EDICIÓN =====
+let idEnEdicion = null;
+const botonEnviar = document.getElementById("botonEnviar");
+const botonCancelarEdicion = document.getElementById("botonCancelarEdicion");
+const avisoEdicion = document.getElementById("avisoEdicion");
+
+function salirModoEdicion() {
+  idEnEdicion = null;
+  botonEnviar.textContent = "Enviar solicitud";
+  botonCancelarEdicion.classList.add("d-none");
+  avisoEdicion.classList.add("d-none");
+}
+
+// Carga una solicitud en el formulario para modificarla (solo Administrador)
+function editarSolicitud(id) {
+  const sesion = obtenerSesion();
+
+  if (!sesion || sesion.rol !== "Administrador") {
+    Swal.fire({
+      icon: "error",
+      title: "Acceso denegado",
+      text: "Solo el administrador puede editar solicitudes."
+    });
+    return;
+  }
+
+  const s = solicitudes.find(function (item) {
+    return item.id === id;
+  });
+
+  if (!s) {
+    return;
+  }
+
+  idEnEdicion = id;
+
+  document.getElementById("nombre").value = s.nombre;
+  document.getElementById("telefono").value = s.telefono;
+  document.getElementById("correo").value = s.correo;
+  document.getElementById("placa").value = s.placa;
+  document.getElementById("marca").value = s.marca;
+  document.getElementById("modelo").value = s.modelo;
+  document.getElementById("anio").value = s.anio;
+  document.getElementById("kilometraje").value = s.kilometraje;
+  document.getElementById("servicio").value = s.servicio;
+  document.getElementById("fecha").value = s.fecha;
+  document.getElementById("hora").value = s.hora;
+  document.getElementById("observaciones").value = s.observaciones;
+  document.querySelector('input[name="prioridad"][value="' + s.prioridad + '"]').checked = true;
+
+  document.querySelectorAll('input[name="adicionales"]').forEach(function (check) {
+    check.checked = s.adicionales.includes(check.value);
+  });
+
+  botonEnviar.textContent = "Guardar cambios";
+  botonCancelarEdicion.classList.remove("d-none");
+  avisoEdicion.textContent = "Editando la solicitud N.º " + id + ". Modifique los datos y pulse \"Guardar cambios\".";
+  avisoEdicion.classList.remove("d-none");
+
+  document.getElementById("solicitud").scrollIntoView({ behavior: "smooth" });
+}
+
+botonCancelarEdicion.addEventListener("click", function () {
+  formSolicitud.reset();
+});
+
 formSolicitud.addEventListener("submit", function (evento) {
   // Evita que el navegador recargue la página al enviar
   evento.preventDefault();
 
-  // Solo se puede registrar una solicitud con sesión iniciada
+  // Solo se puede registrar o editar con sesión iniciada
   const sesion = obtenerSesion();
   if (!sesion) {
     Swal.fire({
       icon: "warning",
       title: "Sesión requerida",
       text: "Inicie sesión para registrar una solicitud."
+    });
+    return;
+  }
+
+  const eraEdicion = idEnEdicion !== null;
+
+  // Solo el administrador puede modificar un registro existente
+  if (eraEdicion && sesion.rol !== "Administrador") {
+    Swal.fire({
+      icon: "error",
+      title: "Acceso denegado",
+      text: "Solo el administrador puede editar solicitudes."
     });
     return;
   }
@@ -152,7 +230,7 @@ formSolicitud.addEventListener("submit", function (evento) {
     adicionales.push(check.value);
   });
 
-  // Crear el objeto de la solicitud
+  // Crear el objeto con los datos del formulario
   const solicitud = {
     id: siguienteId(),
     usuarioId: sesion.id,
@@ -173,28 +251,51 @@ formSolicitud.addEventListener("submit", function (evento) {
     estado: "Pendiente"
   };
 
-  // Agregar al array y guardar en el navegador
-  solicitudes.push(solicitud);
+  if (eraEdicion) {
+    // Actualizar: se conservan el id, el dueño y el estado originales
+    const indice = solicitudes.findIndex(function (s) {
+      return s.id === idEnEdicion;
+    });
+
+    if (indice === -1) {
+      Swal.fire({
+        icon: "error",
+        title: "Solicitud no encontrada",
+        text: "La solicitud que intenta editar ya no existe."
+      });
+      salirModoEdicion();
+      return;
+    }
+
+    solicitud.id = solicitudes[indice].id;
+    solicitud.usuarioId = solicitudes[indice].usuarioId;
+    solicitud.estado = solicitudes[indice].estado;
+    solicitudes[indice] = solicitud;
+  } else {
+    // Crear: se agrega un registro nuevo
+    solicitudes.push(solicitud);
+  }
+
   guardarSolicitudes();
   renderizarMisMantenimientos();
-
-  // Por ahora solo mostramos el resultado en la consola
-  console.table(solicitudes);
+  renderizarAdmin();
 
   formSolicitud.reset();
-  prellenarFormulario();
 
   Swal.fire({
     icon: "success",
-    title: "Solicitud registrada",
-    text: "Su solicitud quedó en estado Pendiente.",
+    title: eraEdicion ? "Solicitud actualizada" : "Solicitud registrada",
+    text: eraEdicion
+      ? "Los cambios se guardaron correctamente."
+      : "Su solicitud quedó en estado Pendiente.",
     timer: 1800,
     showConfirmButton: false
   });
 });
 
-// El botón "Limpiar" vacía todo; volvemos a rellenar los datos del cliente
+// El botón "Limpiar" vacía todo, sale del modo edición y rellena los datos del cliente
 formSolicitud.addEventListener("reset", function () {
+  salirModoEdicion();
   setTimeout(prellenarFormulario, 0);
 });
 
@@ -481,7 +582,16 @@ function renderizarAdmin() {
 
     celdaEstado.appendChild(selectEstado);
     fila.appendChild(celdaEstado);
-        const celdaAcciones = document.createElement("td");
+            const celdaAcciones = document.createElement("td");
+    celdaAcciones.className = "text-nowrap";
+
+    const botonEditar = document.createElement("button");
+    botonEditar.type = "button";
+    botonEditar.className = "btn btn-sm btn-outline-primary me-1";
+    botonEditar.textContent = "Editar";
+    botonEditar.addEventListener("click", function () {
+      editarSolicitud(s.id);
+    });
 
     const botonEliminar = document.createElement("button");
     botonEliminar.type = "button";
@@ -491,6 +601,7 @@ function renderizarAdmin() {
       eliminarSolicitud(s.id);
     });
 
+    celdaAcciones.appendChild(botonEditar);
     celdaAcciones.appendChild(botonEliminar);
     fila.appendChild(celdaAcciones);
 
