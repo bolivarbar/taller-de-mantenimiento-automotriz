@@ -105,18 +105,64 @@ function cerrarSesion() {
 
 // ===== FORMULARIO DE SOLICITUD DE MANTENIMIENTO =====
 const formSolicitud = document.getElementById("formSolicitud");
+const grupoDueno = document.getElementById("grupoDueno");
+const selectDueno = document.getElementById("duenoSolicitud");
 
 // Rellena y bloquea los datos del cliente si quien inició sesión es Cliente
+// Llena el selector con el administrador y los clientes activos
+function cargarOpcionesDueno(sesion) {
+  const anterior = selectDueno.value;
+  selectDueno.innerHTML = "";
+
+  const opcionPropia = document.createElement("option");
+  opcionPropia.value = sesion.id;
+  opcionPropia.textContent = "Solicitud propia (" + sesion.nombre + ")";
+  selectDueno.appendChild(opcionPropia);
+
+  const clientes = usuarios.filter(function (u) {
+    return u.rol === "Cliente" && u.activo;
+  });
+
+  clientes.forEach(function (c) {
+    const opcion = document.createElement("option");
+    opcion.value = c.id;
+    opcion.textContent = c.nombre + " (" + c.usuario + ")";
+    selectDueno.appendChild(opcion);
+  });
+
+  // Conserva la selección anterior si todavía existe
+  if (anterior !== "" && selectDueno.querySelector('option[value="' + anterior + '"]')) {
+    selectDueno.value = anterior;
+  }
+}
+
+// Escribe y bloquea (o limpia y libera) los datos del cliente en el formulario
 function prellenarFormulario() {
   const sesion = obtenerSesion();
   const inputNombre = document.getElementById("nombre");
   const inputTelefono = document.getElementById("telefono");
   const inputCorreo = document.getElementById("correo");
 
-  if (sesion && sesion.rol === "Cliente") {
-    inputNombre.value = sesion.nombre;
-    inputTelefono.value = sesion.telefono;
-    inputCorreo.value = sesion.correo;
+  let titular = null;
+
+  if (sesion && sesion.rol === "Administrador") {
+    // El administrador elige para quién es la solicitud
+    grupoDueno.classList.remove("d-none");
+    cargarOpcionesDueno(sesion);
+    titular = usuarios.find(function (u) {
+      return u.id === Number(selectDueno.value);
+    });
+  } else {
+    grupoDueno.classList.add("d-none");
+    if (sesion) {
+      titular = sesion;
+    }
+  }
+
+  if (titular) {
+    inputNombre.value = titular.nombre;
+    inputTelefono.value = titular.telefono;
+    inputCorreo.value = titular.correo;
     inputNombre.readOnly = true;
     inputTelefono.readOnly = true;
     inputCorreo.readOnly = true;
@@ -130,6 +176,8 @@ function prellenarFormulario() {
   }
 }
 
+// Al cambiar el cliente elegido, se actualizan sus datos en el formulario
+selectDueno.addEventListener("change", prellenarFormulario);
 // ===== MODO EDICIÓN =====
 let idEnEdicion = null;
 const botonEnviar = document.getElementById("botonEnviar");
@@ -141,6 +189,7 @@ function salirModoEdicion() {
   botonEnviar.textContent = "Enviar solicitud";
   botonCancelarEdicion.classList.add("d-none");
   avisoEdicion.classList.add("d-none");
+  selectDueno.disabled = false;
 }
 
 // Carga una solicitud en el formulario para modificarla (solo Administrador)
@@ -212,6 +261,8 @@ formSolicitud.addEventListener("submit", function (evento) {
   }
 
   const eraEdicion = idEnEdicion !== null;
+    // Dueño de la solicitud: el administrador elige; el cliente es siempre él mismo
+  const duenoId = sesion.rol === "Administrador" ? Number(selectDueno.value) : sesion.id;
 
   // Solo el administrador puede modificar un registro existente
   if (eraEdicion && sesion.rol !== "Administrador") {
@@ -233,7 +284,7 @@ formSolicitud.addEventListener("submit", function (evento) {
   // Crear el objeto con los datos del formulario
   const solicitud = {
     id: siguienteId(),
-    usuarioId: sesion.id,
+    usuarioId: duenoId,
     nombre: document.getElementById("nombre").value.trim(),
     telefono: document.getElementById("telefono").value.trim(),
     correo: document.getElementById("correo").value.trim(),
@@ -638,12 +689,13 @@ function actualizarInterfaz() {
       enlaceAdmin.parentElement.classList.remove("d-none");
       seccionMantenimientos.classList.add("d-none");
       enlaceMantenimientos.parentElement.classList.add("d-none");
-    } else {
-      // El cliente ve "Mis mantenimientos" y no el panel
+        } else {
+      // El cliente ve "Mis mantenimientos". El enlace a Administración se muestra,
+      // pero el sistema lo bloquea con un aviso de acceso denegado.
       seccionMantenimientos.classList.remove("d-none");
       enlaceMantenimientos.parentElement.classList.remove("d-none");
       seccionAdmin.classList.add("d-none");
-      enlaceAdmin.parentElement.classList.add("d-none");
+      enlaceAdmin.parentElement.classList.remove("d-none");
     }
   } else {
     // No hay sesión: mostrar login, ocultar todo lo demás
@@ -682,3 +734,35 @@ enlaceLogin.addEventListener("click", function (evento) {
 
 // Al cargar la página, ajustar la interfaz según la sesión actual
 actualizarInterfaz();
+// ===== PROTECCIÓN DE LA SECCIÓN ADMINISTRACIÓN =====
+function esAdministrador() {
+  const sesion = obtenerSesion();
+  return sesion !== null && sesion.rol === "Administrador";
+}
+
+function mostrarAccesoDenegado() {
+  Swal.fire({
+    icon: "error",
+    title: "Acceso denegado",
+    text: "Esta sección es solo para el administrador."
+  });
+}
+
+// Clic en el enlace "Administración" de la barra
+enlaceAdmin.addEventListener("click", function (evento) {
+  if (!esAdministrador()) {
+    evento.preventDefault();
+    mostrarAccesoDenegado();
+  }
+});
+
+// Si alguien escribe #administracion en la dirección del navegador
+function protegerDireccion() {
+  if (window.location.hash === "#administracion" && !esAdministrador()) {
+    mostrarAccesoDenegado();
+    window.location.hash = "#inicio";
+  }
+}
+
+window.addEventListener("hashchange", protegerDireccion);
+protegerDireccion();
