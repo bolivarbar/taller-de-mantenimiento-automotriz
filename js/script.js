@@ -368,6 +368,47 @@ function cambiarEstado(id, nuevoEstado) {
     timer: 1800
   });
 }
+// Elimina una solicitud, pidiendo confirmación (solo el Administrador)
+function eliminarSolicitud(id) {
+  const sesion = obtenerSesion();
+
+  if (!sesion || sesion.rol !== "Administrador") {
+    Swal.fire({
+      icon: "error",
+      title: "Acceso denegado",
+      text: "Solo el administrador puede eliminar solicitudes."
+    });
+    return;
+  }
+
+  Swal.fire({
+    icon: "warning",
+    title: "¿Eliminar la solicitud N.º " + id + "?",
+    text: "Esta acción no se puede deshacer.",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#dc3545"
+  }).then(function (resultado) {
+    if (resultado.isConfirmed) {
+      solicitudes = solicitudes.filter(function (s) {
+        return s.id !== id;
+      });
+      guardarSolicitudes();
+      renderizarAdmin();
+      renderizarMisMantenimientos();
+
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "Solicitud eliminada",
+        showConfirmButton: false,
+        timer: 1800
+      });
+    }
+  });
+}
 // Dibuja la tabla con TODAS las solicitudes (solo para el Administrador)
 function renderizarAdmin() {
   tablaAdmin.innerHTML = "";
@@ -395,7 +436,7 @@ function renderizarAdmin() {
   if (solicitudes.length === 0) {
     const fila = document.createElement("tr");
     const celda = document.createElement("td");
-    celda.colSpan = 9;
+    celda.colSpan = 10;
     celda.className = "text-center text-muted";
     celda.textContent = "Todavía no hay solicitudes registradas.";
     fila.appendChild(celda);
@@ -440,6 +481,18 @@ function renderizarAdmin() {
 
     celdaEstado.appendChild(selectEstado);
     fila.appendChild(celdaEstado);
+        const celdaAcciones = document.createElement("td");
+
+    const botonEliminar = document.createElement("button");
+    botonEliminar.type = "button";
+    botonEliminar.className = "btn btn-sm btn-outline-danger";
+    botonEliminar.textContent = "Eliminar";
+    botonEliminar.addEventListener("click", function () {
+      eliminarSolicitud(s.id);
+    });
+
+    celdaAcciones.appendChild(botonEliminar);
+    fila.appendChild(celdaAcciones);
 
     tablaAdmin.appendChild(fila);
   });
