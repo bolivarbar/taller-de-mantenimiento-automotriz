@@ -333,6 +333,41 @@ function renderizarMisMantenimientos() {
     tablaMantenimientos.appendChild(fila);
   });
 }
+// Cambia el estado de una solicitud (solo el Administrador puede hacerlo)
+function cambiarEstado(id, nuevoEstado) {
+  const sesion = obtenerSesion();
+
+  if (!sesion || sesion.rol !== "Administrador") {
+    Swal.fire({
+      icon: "error",
+      title: "Acceso denegado",
+      text: "Solo el administrador puede cambiar el estado."
+    });
+    return;
+  }
+
+  const solicitud = solicitudes.find(function (s) {
+    return s.id === id;
+  });
+
+  if (!solicitud) {
+    return;
+  }
+
+  solicitud.estado = nuevoEstado;
+  guardarSolicitudes();
+  renderizarAdmin();
+  renderizarMisMantenimientos();
+
+  Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon: "success",
+    title: "Estado actualizado a " + nuevoEstado,
+    showConfirmButton: false,
+    timer: 1800
+  });
+}
 // Dibuja la tabla con TODAS las solicitudes (solo para el Administrador)
 function renderizarAdmin() {
   tablaAdmin.innerHTML = "";
@@ -385,11 +420,25 @@ function renderizarAdmin() {
     fila.appendChild(crearCelda(s.servicio));
     fila.appendChild(crearCelda(s.prioridad));
 
-    const celdaEstado = document.createElement("td");
-    const etiqueta = document.createElement("span");
-    etiqueta.className = "badge " + (CLASES_ESTADO[s.estado] || "bg-secondary");
-    etiqueta.textContent = s.estado;
-    celdaEstado.appendChild(etiqueta);
+        const celdaEstado = document.createElement("td");
+    const selectEstado = document.createElement("select");
+    selectEstado.className = "form-select form-select-sm";
+
+    Object.keys(CLASES_ESTADO).forEach(function (estado) {
+      const opcion = document.createElement("option");
+      opcion.value = estado;
+      opcion.textContent = estado;
+      if (estado === s.estado) {
+        opcion.selected = true;
+      }
+      selectEstado.appendChild(opcion);
+    });
+
+    selectEstado.addEventListener("change", function () {
+      cambiarEstado(s.id, selectEstado.value);
+    });
+
+    celdaEstado.appendChild(selectEstado);
     fila.appendChild(celdaEstado);
 
     tablaAdmin.appendChild(fila);
