@@ -38,7 +38,9 @@
           <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
           <li class="nav-item"><a class="nav-link" id="enlaceSolicitud" href="#solicitud">Solicitud</a></li>
           <li class="nav-item"><a class="nav-link" id="enlacePerfil" href="#perfil">Mi perfil</a></li>
-          <li class="nav-item"><a class="nav-link" href="#login" id="enlaceLogin">Iniciar sesión</a></li>
+          <li class="nav-item"><a class="nav-link" id="enlaceMantenimientos" href="#mantenimientos">Mis mantenimientos</a></li>
+          <li class="nav-item"><a class="nav-link" id="enlaceAdmin" href="#administracion">Administración</a></li>
+          <li class="nav-item"><a class="nav-link" id="enlaceLogin" href="#login">Iniciar sesión</a></li>
         </ul>
       </div>
     </div>
@@ -55,7 +57,7 @@
           de tus solicitudes y mantente al día con cada servicio.
         </p>
         <a href="#servicios" class="btn btn-primary btn-lg me-2">Ver servicios</a>
-        <a href="#solicitud" class="btn btn-outline-secondary btn-lg">Solicitar mantenimiento</a>
+        <a href="#solicitud" id="botonSolicitar" class="btn btn-outline-secondary btn-lg">Solicitar mantenimiento</a>
       </div>
     </section>
 
@@ -180,11 +182,17 @@
     </section>
 
     <!-- SECCIÓN SOLICITUD DE MANTENIMIENTO -->
-    <section id="solicitud" class="py-5">
+    <section id="solicitud" class="py-5 d-none">
       <div class="container">
         <h2 class="text-center mb-4">Solicitud de mantenimiento</h2>
 
         <form id="formSolicitud" class="col-lg-8 mx-auto" novalidate>
+
+          <!-- Selector de cliente (solo Administrador) -->
+          <div id="grupoDueno" class="mb-4 d-none">
+            <label for="duenoSolicitud" class="form-label">Registrar solicitud para</label>
+            <select class="form-select" id="duenoSolicitud"></select>
+          </div>
 
           <!-- Datos del cliente -->
           <fieldset class="mb-4">
@@ -334,13 +342,76 @@
             </div>
           </fieldset>
 
+          <!-- Aviso de edición -->
+          <div id="avisoEdicion" class="alert alert-info d-none"></div>
+
           <!-- Botones -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+            <button type="submit" id="botonEnviar" class="btn btn-primary">Enviar solicitud</button>
             <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
+            <button type="button" id="botonCancelarEdicion" class="btn btn-outline-danger d-none">Cancelar edición</button>
           </div>
 
         </form>
+      </div>
+    </section>
+
+    <!-- SECCIÓN MIS MANTENIMIENTOS -->
+    <section id="mantenimientos" class="py-5 bg-light d-none">
+      <div class="container">
+        <h2 class="text-center mb-4">Mis mantenimientos</h2>
+
+        <p id="mensajeSinSolicitudes" class="text-center text-muted d-none">
+          Aún no tiene solicitudes registradas.
+        </p>
+
+        <div class="table-responsive" id="contenedorTabla">
+          <table class="table table-striped table-hover align-middle bg-white">
+            <thead class="table-dark">
+              <tr>
+                <th>N.º</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Placa</th>
+                <th>Vehículo</th>
+                <th>Servicio</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tablaMantenimientos"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN ADMINISTRACIÓN -->
+    <section id="administracion" class="py-5 d-none">
+      <div class="container">
+        <h2 class="text-center mb-2">Panel de administración</h2>
+        <p class="text-center text-muted mb-4">Todas las solicitudes de mantenimiento de los clientes.</p>
+
+        <div id="resumenAdmin" class="d-flex flex-wrap justify-content-center gap-2 mb-4"></div>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>N.º</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Placa</th>
+                <th>Vehículo</th>
+                <th>Servicio</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaAdmin"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 

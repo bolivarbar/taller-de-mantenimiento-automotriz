@@ -1,0 +1,116 @@
+/* ===== VARIABLES DE COLOR ===== */
+:root {
+  --taller-oscuro: #1f2933;
+  --taller-medio: #3e4c59;
+  --taller-acento: #f59f00;
+  --taller-claro: #f4f6f8;
+}
+
+/* ===== GENERAL ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  color: #212529;
+}
+
+/* Las secciones no quedan tapadas por la barra fija al navegar */
+section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* ===== ENCABEZADO Y NAVEGACIÓN ===== */
+header {
+  background: linear-gradient(135deg, var(--taller-oscuro), var(--taller-medio));
+  border-bottom: 4px solid var(--taller-acento);
+}
+
+header h1 {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  color: var(--taller-acento) !important;
+}
+
+.navbar .nav-link {
+  transition: color 0.2s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: var(--taller-acento);
+}
+
+/* ===== CATÁLOGO DE SERVICIOS ===== */
+#servicios .card {
+  border: 0;
+  border-top: 4px solid var(--taller-acento);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#servicios .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ===== PERFIL ===== */
+#perfil dt {
+  color: var(--taller-oscuro);
+}
+
+/* ===== FORMULARIOS ===== */
+#formSolicitud fieldset {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1.25rem 1.25rem 0.5rem;
+}
+
+#formSolicitud legend {
+  float: none;
+  width: auto;
+  padding: 0 0.5rem;
+  font-weight: 600;
+  color: var(--taller-oscuro);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--taller-acento);
+  box-shadow: 0 0 0 0.25rem rgba(245, 159, 0, 0.25);
+}
+
+/* Campos bloqueados (datos del cliente) */
+.form-control[readonly] {
+  background-color: #e9ecef;
+}
+
+/* ===== TABLAS ===== */
+.table thead th {
+  white-space: nowrap;
+}
+
+.badge {
+  font-weight: 600;
+}
+
+/* ===== PIE DE PÁGINA ===== */
+footer {
+  border-top: 4px solid var(--taller-acento);
+}
+
+/* ===== PANTALLAS PEQUEÑAS ===== */
+@media (max-width: 576px) {
+  header h1 {
+    font-size: 1.4rem;
+  }
+
+  #inicio h2 {
+    font-size: 2rem;
+  }
+}
